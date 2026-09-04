@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package bds360;
+
+// Option cho Java
+option java_multiple_files = true;
+option java_package = "vn.bds360.backend.grpc";
+
+// Định nghĩa Service
+service InternalStatisticService {
+  rpc GetTotalPosts (EmptyRequest) returns (PostCountResponse);
+}
+
+message EmptyRequest {}
+
+message PostCountResponse {
+  int64 total_count = 1;
+}

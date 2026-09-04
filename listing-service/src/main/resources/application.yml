@@ -1,0 +1,19 @@
+server:
+  port: 8082 # Cổng cho REST API thông thường gọi từ Gateway
+
+spring:
+  datasource:
+    # Nếu đang chạy local chưa qua docker thì dùng localhost, 
+    # Nếu chạy qua docker-compose thì thay localhost bằng tên service database (vd: mysql-db)
+    url: jdbc:mysql://localhost:3306/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# Cấu hình thư viện net.devh.boot.grpc
+grpc:
+  server:
+    port: 9092 # Cổng chuyên dụng để các service khác gọi gRPC tới
