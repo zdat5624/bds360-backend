@@ -2,14 +2,30 @@ syntax = "proto3";
 
 package bds360;
 
-// Option cho Java
 option java_multiple_files = true;
 option java_package = "vn.bds360.backend.grpc";
+option csharp_namespace = "Bds360.Grpc";
 
-// Định nghĩa Service
+// Service cũ của Listing / Statistic
 service InternalStatisticService {
   rpc GetTotalPosts (EmptyRequest) returns (PostCountResponse);
 }
+
+// === THÊM SERVICE MỚI CHO IDENTITY ===
+service InternalIdentityService {
+  rpc ValidateToken (TokenValidationRequest) returns (TokenValidationResponse);
+}
+
+message TokenValidationRequest {
+  string token = 1;
+}
+
+message TokenValidationResponse {
+  bool is_valid = 1;
+  int64 user_id = 2;
+  string role = 3;
+}
+// ===================================
 
 message EmptyRequest {}
 

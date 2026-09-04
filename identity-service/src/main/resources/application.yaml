@@ -1,0 +1,17 @@
+server:
+  port: 8081 # REST API Port
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/bds360_identity_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+grpc:
+  server:
+    port: 9091

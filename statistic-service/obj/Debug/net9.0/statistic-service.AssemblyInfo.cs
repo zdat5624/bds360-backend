@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("statistic-service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+43cb46496c08cce073ddf3f00cb301b7cca40223")]
 [assembly: System.Reflection.AssemblyProductAttribute("statistic-service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("statistic-service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

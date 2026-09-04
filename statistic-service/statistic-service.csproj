@@ -14,4 +14,9 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Đổi thành dấu gạch chéo tới (/) -->
+    <Protobuf Include="../_shared/proto/bds360_internal.proto" GrpcServices="Client" />
+  </ItemGroup>
+
 </Project>
