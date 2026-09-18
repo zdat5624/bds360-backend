@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Mydata\\University\\Nam5HK1\\KTHDV\\final-project\\source-code\\bds360-backend\\statistic-service\\statistic-service.csproj": {}
+    "/app/statistic-service.csproj": {}
   },
   "projects": {
-    "C:\\Mydata\\University\\Nam5HK1\\KTHDV\\final-project\\source-code\\bds360-backend\\statistic-service\\statistic-service.csproj": {
+    "/app/statistic-service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Mydata\\University\\Nam5HK1\\KTHDV\\final-project\\source-code\\bds360-backend\\statistic-service\\statistic-service.csproj",
+        "projectUniqueName": "/app/statistic-service.csproj",
         "projectName": "statistic-service",
-        "projectPath": "C:\\Mydata\\University\\Nam5HK1\\KTHDV\\final-project\\source-code\\bds360-backend\\statistic-service\\statistic-service.csproj",
-        "packagesPath": "C:\\Users\\zdat5\\.nuget\\packages\\",
-        "outputPath": "C:\\Mydata\\University\\Nam5HK1\\KTHDV\\final-project\\source-code\\bds360-backend\\statistic-service\\obj\\",
+        "projectPath": "/app/statistic-service.csproj",
+        "packagesPath": "/root/.nuget/packages/",
+        "outputPath": "/app/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\zdat5\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/root/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -44,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net9.0": {
@@ -74,7 +68,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.318/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

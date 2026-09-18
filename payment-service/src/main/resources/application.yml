@@ -1,0 +1,27 @@
+server:
+  port: 8083 # Chạy cổng riêng biệt
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/bds360_payment_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# Bốc config VNPAY từ dự án cũ qua đây
+vnpay:
+  tmn-code: ${VNP_TMN_CODE:YOUR_TMN_CODE}
+  hash-secret: ${VNP_HASH_SECRET:YOUR_HASH_SECRET}
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: ${VNP_RETURN_URL:http://localhost:3000/payment-result}
+
+# Cấu hình gRPC port (nếu cần cung cấp API nội bộ cho các service khác)
+grpc:
+  server:
+    port: 9094

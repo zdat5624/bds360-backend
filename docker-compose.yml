@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 1. DATABASE TẬP TRUNG
+  # ==========================================
+  mysql-db:
+    image: mysql:8.0
+    container_name: bds360_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Ánh xạ thư mục chứa init.sql vào thư mục khởi tạo tự động của MySQL
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+
+  # ==========================================
+  # 2. NESTJS SERVICES (Node.js) - Hot Reload
+  # ==========================================
+  media-service:
+    image: node:20-alpine
+    container_name: bds360_media
+    working_dir: /app
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./media-service:/app
+      - /app/node_modules # Cách ly node_modules khỏi Windows
+    command: sh -c "npm install && npm run start:dev"
+
+  notification-service:
+    image: node:20-alpine
+    container_name: bds360_notification
+    working_dir: /app
+    ports:
+      - "3002:3002"
+      - "9093:9093" # Port gRPC cho Spring Boot gọi qua
+    volumes:
+      - ./notification-service:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run start:dev"
+
+  # ==========================================
+  # 3. .NET SERVICE (C#) - Hot Reload (dotnet watch)
+  # ==========================================
+  statistic-service:
+    image: mcr.microsoft.com/dotnet/sdk:9.0 # Dùng SDK để có tính năng Watch
+    container_name: bds360_statistic
+    working_dir: /app
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./statistic-service:/app
+    environment:
+      # Bắt buộc để File Watcher của .NET hoạt động ổn định trong Docker
+      - DOTNET_USE_POLLING_FILE_WATCHER=true 
+      - ASPNETCORE_ENVIRONMENT=Development
+    command: dotnet watch run --urls "http://0.0.0.0:5001"
+
+  # ==========================================
+  # 4. SPRING BOOT SERVICES (Java) - Hot Reload (gradlew -t)
+  # ==========================================
+  api-gateway:
+    image: eclipse-temurin:21-jdk-alpine
+    container_name: bds360_gateway
+    working_dir: /app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api-gateway:/app
+      - gateway_cache:/root/.gradle
+    command: ./gradlew bootRun -t
+
+  identity-service:
+    image: eclipse-temurin:21-jdk-alpine
+    container_name: bds360_identity
+    working_dir: /app
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./identity-service:/app
+      - identity_cache:/root/.gradle
+    environment:
+      # Trỏ DB Host về tên container thay vì localhost
+      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    command: ./gradlew bootRun -t
+    depends_on:
+      - mysql-db
+
+  listing-service:
+    image: eclipse-temurin:21-jdk-alpine
+    container_name: bds360_listing
+    working_dir: /app
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./listing-service:/app
+      - listing_cache:/root/.gradle
+    environment:
+      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    command: ./gradlew bootRun -t
+    depends_on:
+      - mysql-db
+
+  payment-service:
+    image: eclipse-temurin:21-jdk-alpine
+    container_name: bds360_payment
+    working_dir: /app
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./payment-service:/app
+      - payment_cache:/root/.gradle
+    environment:
+      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_payment_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    command: ./gradlew bootRun -t
+    depends_on:
+      - mysql-db
+
+# ==========================================
+# KHAI BÁO VOLUMES DÙNG CHUNG
+# ==========================================
+volumes:
+  mysql_data:
+  gateway_cache:
+  identity_cache:
+  listing_cache:
+  payment_cache:
+
+
