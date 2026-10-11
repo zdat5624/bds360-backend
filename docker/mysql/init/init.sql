@@ -1,9 +1,9 @@
-CREATE DATABASE IF NOT EXISTS bds360_db;
+CREATE DATABASE IF NOT EXISTS bds360_identity_db;
 CREATE DATABASE IF NOT EXISTS bds360_payment_db;
-CREATE DATABASE IF NOT EXISTS bds360_media_db;
+CREATE DATABASE IF NOT EXISTS bds360_listing_db;
 CREATE DATABASE IF NOT EXISTS bds360_notification_db;
-CREATE DATABASE IF NOT EXISTS bds360_statistic_db;
+-- CREATE DATABASE IF NOT EXISTS bds360_statistic_db;
 
--- Chấp nhận mọi IP kết nối vào bằng tài khoản root
+-- Chỉ cần gán quyền, MySQL tự động hiểu mật khẩu root từ environment
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 FLUSH PRIVILEGES;

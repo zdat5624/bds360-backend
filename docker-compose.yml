@@ -15,7 +15,14 @@ services:
       - mysql_data:/var/lib/mysql
       # Ánh xạ thư mục chứa init.sql vào thư mục khởi tạo tự động của MySQL
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
-    command: --default-authentication-plugin=mysql_native_password
+    # FIX 1: Bỏ command cũ, MySQL 8.0 mặc định dùng caching_sha2_password, Java 21 hỗ trợ hoàn toàn
+    # command: --default-authentication-plugin=mysql_native_password
+    # FIX 2: Sửa lại lệnh Healthcheck chuẩn để nó dùng password ping vào db
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      timeout: 10s
+      retries: 10
+      start_period: 20s
 
   # ==========================================
   # 2. NESTJS SERVICES (Node.js) - Hot Reload
@@ -84,11 +91,12 @@ services:
       - ./identity-service:/app
       - identity_cache:/root/.gradle
     environment:
-      # Trỏ DB Host về tên container thay vì localhost
-      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-    command: ./gradlew bootRun -t
+      # FIX 3: Rút gọn DB_URL, loại bỏ cờ dư thừa, đẩy việc chờ đợi cho depends_on
+      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_identity_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+    command: sh -c './gradlew -t classes & ./gradlew bootRun'
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
 
   listing-service:
     image: eclipse-temurin:21-jdk-alpine
@@ -100,10 +108,11 @@ services:
       - ./listing-service:/app
       - listing_cache:/root/.gradle
     environment:
-      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_listing_db?createDatabaseIfNotExist=true&serverTimezone=UTC
     command: ./gradlew bootRun -t
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
 
   payment-service:
     image: eclipse-temurin:21-jdk-alpine
@@ -115,10 +124,11 @@ services:
       - ./payment-service:/app
       - payment_cache:/root/.gradle
     environment:
-      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_payment_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_payment_db?createDatabaseIfNotExist=true&serverTimezone=UTC
     command: ./gradlew bootRun -t
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
 
 # ==========================================
 # KHAI BÁO VOLUMES DÙNG CHUNG
@@ -129,5 +139,3 @@ volumes:
   identity_cache:
   listing_cache:
   payment_cache:
-
-

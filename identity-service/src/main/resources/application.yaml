@@ -1,17 +1,30 @@
 server:
-  port: 8081 # REST API Port
+  port: 8081
 
 spring:
+  application:
+    name: identity-service
   datasource:
-    url: jdbc:mysql://localhost:3306/bds360_identity_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    # Cú pháp ${TÊN_BIẾN:Giá_trị_mặc_định}
+    url: ${DB_URL:jdbc:mysql://localhost:3307/bds360_identity_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
     username: root
-    password: 123456
+    password: root
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-
+    show-sql: false
+  devtools:
+    restart:
+      enabled: true
+      poll-interval: 2s
+      quiet-period: 1s
 
 grpc:
   server:
     port: 9091
+
+# Cấu hình JWT map trực tiếp với JwtProperties.java
+api:
+  jwt:
+    base64-secret: ***REMOVED***
+    token-validity-in-seconds: 3600000

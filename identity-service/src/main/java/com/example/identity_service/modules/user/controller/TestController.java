@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping("/ping")
     public String ping() {
+        String t = "Identity Service is running! 1";
         return "Identity Service is running!";
     }
 }
