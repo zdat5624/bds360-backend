@@ -79,9 +79,3 @@ protobuf {
     }
 }
 
-tasks.register('copySeedData', Copy) {
-    from rootProject.file('../_shared/data') // Đường dẫn trỏ ra ngoài thư mục chung
-    into 'src/main/resources/data'
-    include 'users.csv'
-}
-processResources.dependsOn copySeedData

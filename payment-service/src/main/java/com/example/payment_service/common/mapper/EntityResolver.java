@@ -1,9 +1,9 @@
 package com.example.payment_service.common.mapper;
 
+import org.mapstruct.Named;
 import org.mapstruct.TargetType;
 import org.springframework.stereotype.Component;
 
-import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 

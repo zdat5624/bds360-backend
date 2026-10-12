@@ -62,7 +62,7 @@ public class StartupRunner {
 
         // Nhờ Gradle task 'copySeedData', file users.csv đã nằm gọn trong /data/
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new ClassPathResource("/data/users.csv").getInputStream()))) {
+                new InputStreamReader(new ClassPathResource("data/users.csv").getInputStream()))) {
 
             String line;
             boolean isFirstLine = true;

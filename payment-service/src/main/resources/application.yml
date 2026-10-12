@@ -16,10 +16,19 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
 
 grpc:
   server:
     port: 9094
+
+api:
+  jwt:
+    base64-secret: ***REMOVED***
+    token-validity-in-seconds: 3600000
 
 vnp:
   tmn-code: ${VNP_TMN_CODE:87U46G89}

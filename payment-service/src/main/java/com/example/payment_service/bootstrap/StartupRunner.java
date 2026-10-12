@@ -49,7 +49,7 @@ public class StartupRunner {
         // Nhờ Gradle, file users.csv cũng nằm chình ình trong /data/ của Payment
         // Service
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new ClassPathResource("/data/users.csv").getInputStream()))) {
+                new InputStreamReader(new ClassPathResource("data/users.csv").getInputStream()))) {
 
             String line;
             boolean isFirstLine = true;

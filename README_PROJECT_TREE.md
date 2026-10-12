@@ -242,6 +242,8 @@ bds360-backend
 │     │  │  └─ com
 │     │  │     └─ example
 │     │  │        └─ payment_service
+│     │  │           ├─ bootstrap
+│     │  │           │  └─ StartupRunner.java
 │     │  │           ├─ common
 │     │  │           │  ├─ annotation
 │     │  │           │  │  └─ ApiGlobalResponse.java
@@ -339,6 +341,8 @@ bds360-backend
 │  │  └─ GreeterService.cs
 │  └─ statistic-service.csproj
 └─ _shared
+   ├─ data
+   │  └─ users.csv
    └─ proto
       ├─ bds360_internal.proto
       ├─ common.proto
