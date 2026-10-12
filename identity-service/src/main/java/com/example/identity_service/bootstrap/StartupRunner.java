@@ -1,12 +1,19 @@
 package com.example.identity_service.bootstrap;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,116 +38,93 @@ public class StartupRunner {
 
     @EventListener(ApplicationReadyEvent.class)
     public void run() {
-
-        System.out.println(">>> START INIT IDENTITY DATABASE: 3");
-
-        System.out.println(">>> INIT TABLE 'users': 1 ADMIN, 50 USER");
+        System.out.println(">>> START INIT IDENTITY DATABASE");
 
         if (this.userRepository.count() > 0) {
             System.out.println(">>> SKIP! INIT TABLE 'users' : ALREADY HAVE DATA ... ");
         } else {
-            initSampleUsers();
+            initUsersFromCsv();
         }
 
         System.out.println(">>> END INIT IDENTITY DATABASE");
     }
 
     @Transactional
-    private void initSampleUsers() {
-        if (userRepository.count() > 1)
-            return; // Tránh seed đè dữ liệu
-
+    private void initUsersFromCsv() {
+        System.out.println(">>> READING USERS FROM CSV...");
         List<User> userList = new ArrayList<>();
-        String password = passwordEncoder.encode("123456");
-        Random random = new Random();
-        Instant now = Instant.now();
 
-        // ===== DATA NAME =====
-        String[] lastNames = { "Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Đặng" };
-        String[] maleMiddleNames = { "Văn", "Hữu", "Đức" };
-        String[] femaleMiddleNames = { "Thị", "Ngọc", "Thu" };
-        String[] maleFirstNames = { "Anh", "Bình", "Cường", "Dũng", "Hải", "Hưng", "Khánh", "Minh", "Nam" };
-        String[] femaleFirstNames = { "Anh", "Hà", "Hương", "Lan", "Linh", "Mai", "Ngọc", "Thảo", "Trang" };
+        // Formatter để parse thời gian từ CSV (VD: "2022-10-12 19:24:34.763444")
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd HH:mm:ss")
+                .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                .toFormatter();
 
-        String[] addresses = { "Hà Nội", "Đà Nẵng", "TP. Hồ Chí Minh" };
+        // Nhờ Gradle task 'copySeedData', file users.csv đã nằm gọn trong /data/
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new ClassPathResource("/data/users.csv").getInputStream()))) {
 
-        // ===== 1. ADMIN =====
-        User admin = new User();
-        admin.setEmail("admin@gmail.com");
-        admin.setName("Quản trị viên");
-        admin.setPassword(password);
-        admin.setRole(Role.ADMIN);
-        admin.setGender(Gender.MALE);
-        admin.setAvatar("https://randomuser.me/api/portraits/men/97.jpg");
-        admin.setBalance(1_000_000_000L);
-        admin.setPhone("0123456789");
-        admin.setAddress("TP. Hồ Chí Minh");
-        admin.setCreatedAt(now.minus(4 * 365L, java.time.temporal.ChronoUnit.DAYS));
-        userList.add(admin);
+            String line;
+            boolean isFirstLine = true;
 
-        // ===== 2. USERS =====
-        for (int i = 1; i <= 50; i++) {
-            User user = new User();
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // Bỏ qua dòng Header
+                    continue;
+                }
 
-            user.setEmail("user" + i + "@gmail.com");
-            user.setPassword(password);
-            user.setRole(Role.USER);
+                // Cắt chuỗi bằng dấu phẩy, bỏ qua dấu phẩy nằm trong ngoặc kép
+                String[] cols = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+                for (int i = 0; i < cols.length; i++) {
+                    cols[i] = cols[i].replaceAll("^\"|\"$", ""); // Xóa ngoặc kép 2 đầu
+                }
 
-            // Giới tính
-            Gender gender = random.nextBoolean() ? Gender.MALE : Gender.FEMALE;
-            user.setGender(gender);
+                User user = new User();
+                // cols[0] = id (JPA IDENTITY tự tăng)
+                user.setAddress(cols[1]);
+                user.setAvatar(cols[2]);
+                user.setBalance(Long.parseLong(cols[3]));
+                user.setCreatedAt(LocalDateTime.parse(cols[4], formatter).toInstant(ZoneOffset.UTC));
+                user.setEmail(cols[6]);
+                user.setGender(Gender.valueOf(cols[7]));
+                user.setIsVerified("1".equals(cols[8]));
+                user.setName(cols[9]);
+                user.setPassword(cols[10]);
+                user.setPhone(cols[11]);
+                user.setRole(Role.valueOf(cols[12]));
 
-            // ===== RANDOM NAME =====
-            String lastName = lastNames[random.nextInt(lastNames.length)];
-            String middleName = (gender == Gender.MALE)
-                    ? maleMiddleNames[random.nextInt(maleMiddleNames.length)]
-                    : femaleMiddleNames[random.nextInt(femaleMiddleNames.length)];
+                if (!"NULL".equals(cols[13]) && !cols[13].isEmpty()) {
+                    user.setUpdatedAt(LocalDateTime.parse(cols[13], formatter).toInstant(ZoneOffset.UTC));
+                }
 
-            String firstName = (gender == Gender.MALE)
-                    ? maleFirstNames[random.nextInt(maleFirstNames.length)]
-                    : femaleFirstNames[random.nextInt(femaleFirstNames.length)];
+                userList.add(user);
+            }
 
-            user.setName(lastName + " " + middleName + " " + firstName);
+            userRepository.saveAll(userList);
+            System.out.println(">>> SUCCESSFULLY SEEDED " + userList.size() + " USERS FROM CSV.");
 
-            // ===== AVATAR =====
-            String genderApiDir = (gender == Gender.MALE) ? "men" : "women";
-            int avatarIndex = random.nextInt(100); // tránh vượt range
-            user.setAvatar("https://randomuser.me/api/portraits/" + genderApiDir + "/" + avatarIndex + ".jpg");
+            // Sinh dữ liệu Verification ngay sau khi lưu User
+            seedVerificationSubmissions(userList);
 
-            // ===== OTHER INFO =====
-            user.setBalance(500_000L * i);
-            user.setPhone("09" + String.format("%08d", random.nextInt(100_000_000)));
-            user.setAddress(addresses[random.nextInt(addresses.length)]);
-
-            long randomDaysAgo = random.nextLong(1, 4 * 365 + 1);
-            // Trừ thêm một lượng giây ngẫu nhiên trong ngày đó cho nó thật
-            long randomSecondsInDay = random.nextLong(86400);
-
-            Instant randomCreatedAt = now
-                    .minus(randomDaysAgo, java.time.temporal.ChronoUnit.DAYS)
-                    .minusSeconds(randomSecondsInDay);
-
-            user.setCreatedAt(randomCreatedAt);
-            // Cập nhật updatedAt bằng createdAt luôn cho logic
-            user.setUpdatedAt(randomCreatedAt);
-
-            userList.add(user);
+        } catch (Exception e) {
+            System.err.println(">>> LỖI ĐỌC FILE USERS.CSV: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        userRepository.saveAll(userList);
-
-        // ===== 3. VERIFICATION =====
-        seedVerificationSubmissions(userList);
     }
 
     private void seedVerificationSubmissions(List<User> users) {
+        System.out.println(">>> SEEDING VERIFICATION SUBMISSIONS...");
         List<VerificationSubmission> submissions = new ArrayList<>();
         Instant now = Instant.now();
 
         for (int i = 0; i < users.size(); i++) {
             User user = users.get(i);
 
-            // Reset mặc định
+            // Reset mặc định (bỏ qua admin)
+            if (Role.ADMIN.equals(user.getRole())) {
+                continue;
+            }
+
             user.setIsVerified(false);
 
             int caseType = i % 3;
@@ -198,6 +182,8 @@ public class StartupRunner {
 
         // Lưu toàn bộ submissions
         verificationRepo.saveAll(submissions);
+
+        System.out.println(">>> SUCCESSFULLY SEEDED VERIFICATION SUBMISSIONS.");
     }
 
     // Hàm helper để tạo object submission nhanh gọn
@@ -222,4 +208,99 @@ public class StartupRunner {
 
         return sub;
     }
+
+    // =========================================================================================
+    // LEGACY CODE - GIỮ LẠI LÀM TÀI LIỆU THAM KHẢO CHO LOGIC TẠO DỮ LIỆU NGẪU NHIÊN
+    // =========================================================================================
+    // @Transactional
+    // private void initSampleUsers() {
+    // if (userRepository.count() > 1)
+    // return; // Tránh seed đè dữ liệu
+    //
+    // List<User> userList = new ArrayList<>();
+    // String password = passwordEncoder.encode("123456");
+    // Random random = new Random();
+    // Instant now = Instant.now();
+    //
+    // // ===== DATA NAME =====
+    // String[] lastNames = { "Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh",
+    // "Phan", "Vũ", "Đặng" };
+    // String[] maleMiddleNames = { "Văn", "Hữu", "Đức" };
+    // String[] femaleMiddleNames = { "Thị", "Ngọc", "Thu" };
+    // String[] maleFirstNames = { "Anh", "Bình", "Cường", "Dũng", "Hải", "Hưng",
+    // "Khánh", "Minh", "Nam" };
+    // String[] femaleFirstNames = { "Anh", "Hà", "Hương", "Lan", "Linh", "Mai",
+    // "Ngọc", "Thảo", "Trang" };
+    //
+    // String[] addresses = { "Hà Nội", "Đà Nẵng", "TP. Hồ Chí Minh" };
+    //
+    // // ===== 1. ADMIN =====
+    // User admin = new User();
+    // admin.setEmail("admin@gmail.com");
+    // admin.setName("Quản trị viên");
+    // admin.setPassword(password);
+    // admin.setRole(Role.ADMIN);
+    // admin.setGender(Gender.MALE);
+    // admin.setAvatar("https://randomuser.me/api/portraits/men/97.jpg");
+    // admin.setBalance(1_000_000_000L);
+    // admin.setPhone("0123456789");
+    // admin.setAddress("TP. Hồ Chí Minh");
+    // admin.setCreatedAt(now.minus(4 * 365L, java.time.temporal.ChronoUnit.DAYS));
+    // userList.add(admin);
+    //
+    // // ===== 2. USERS =====
+    // for (int i = 1; i <= 50; i++) {
+    // User user = new User();
+    //
+    // user.setEmail("user" + i + "@gmail.com");
+    // user.setPassword(password);
+    // user.setRole(Role.USER);
+    //
+    // // Giới tính
+    // Gender gender = random.nextBoolean() ? Gender.MALE : Gender.FEMALE;
+    // user.setGender(gender);
+    //
+    // // ===== RANDOM NAME =====
+    // String lastName = lastNames[random.nextInt(lastNames.length)];
+    // String middleName = (gender == Gender.MALE)
+    // ? maleMiddleNames[random.nextInt(maleMiddleNames.length)]
+    // : femaleMiddleNames[random.nextInt(femaleMiddleNames.length)];
+    //
+    // String firstName = (gender == Gender.MALE)
+    // ? maleFirstNames[random.nextInt(maleFirstNames.length)]
+    // : femaleFirstNames[random.nextInt(femaleFirstNames.length)];
+    //
+    // user.setName(lastName + " " + middleName + " " + firstName);
+    //
+    // // ===== AVATAR =====
+    // String genderApiDir = (gender == Gender.MALE) ? "men" : "women";
+    // int avatarIndex = random.nextInt(100); // tránh vượt range
+    // user.setAvatar("https://randomuser.me/api/portraits/" + genderApiDir + "/" +
+    // avatarIndex + ".jpg");
+    //
+    // // ===== OTHER INFO =====
+    // user.setBalance(500_000L * i);
+    // user.setPhone("09" + String.format("%08d", random.nextInt(100_000_000)));
+    // user.setAddress(addresses[random.nextInt(addresses.length)]);
+    //
+    // long randomDaysAgo = random.nextLong(1, 4 * 365 + 1);
+    // // Trừ thêm một lượng giây ngẫu nhiên trong ngày đó cho nó thật
+    // long randomSecondsInDay = random.nextLong(86400);
+    //
+    // Instant randomCreatedAt = now
+    // .minus(randomDaysAgo, java.time.temporal.ChronoUnit.DAYS)
+    // .minusSeconds(randomSecondsInDay);
+    //
+    // user.setCreatedAt(randomCreatedAt);
+    // // Cập nhật updatedAt bằng createdAt luôn cho logic
+    // user.setUpdatedAt(randomCreatedAt);
+    //
+    // userList.add(user);
+    // }
+    //
+    // userRepository.saveAll(userList);
+    //
+    // // ===== 3. VERIFICATION =====
+    // seedVerificationSubmissions(userList);
+    // }
 }

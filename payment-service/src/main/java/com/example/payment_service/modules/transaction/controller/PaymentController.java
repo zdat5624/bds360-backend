@@ -25,6 +25,7 @@ import com.example.payment_service.modules.transaction.service.VNPAYService;
 import com.example.payment_service.modules.transaction.util.VnPayUtil;
 import com.example.payment_service.security.annotation.CurrentUser;
 import com.example.payment_service.security.annotation.RequireLogin;
+import com.example.payment_service.security.dto.UserContext;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +50,7 @@ public class PaymentController {
     @RequireLogin
     public ApiResponse<PaymentLinkResponse> createPayment(
             @RequestBody CreatePaymentRequest requestDTO,
-            @CurrentUser User user, // <-- Bơm trực tiếp User từ Custom Resolver
+            @CurrentUser UserContext user, // <-- Bơm trực tiếp User từ Custom Resolver
             HttpServletRequest request) {
 
         // Controller có nhiệm vụ lấy IP của Client (Trường hợp ngoại lệ bắt buộc dùng

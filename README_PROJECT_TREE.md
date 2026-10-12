@@ -101,7 +101,9 @@ bds360-backend
 │     │  │           │     │  ├─ Gender.java
 │     │  │           │     │  └─ VerificationStatus.java
 │     │  │           │     ├─ controller
-│     │  │           │     │  └─ TestController.java
+│     │  │           │     │  ├─ TestController.java
+│     │  │           │     │  ├─ UserController.java
+│     │  │           │     │  └─ VerificationController.java
 │     │  │           │     ├─ dto
 │     │  │           │     │  ├─ request
 │     │  │           │     │  │  ├─ CreateUserRequest.java
@@ -137,13 +139,19 @@ bds360-backend
 │     │  │              │  └─ RequireLogin.java
 │     │  │              ├─ config
 │     │  │              │  ├─ GoogleProperties.java
-│     │  │              │  └─ JwtProperties.java
+│     │  │              │  ├─ JwtProperties.java
+│     │  │              │  └─ WebMvcConfig.java
 │     │  │              ├─ CustomAccessDeniedHandler.java
 │     │  │              ├─ CustomAuthenticationEntryPoint.java
+│     │  │              ├─ CustomUserDetails.java
 │     │  │              ├─ CustomUserDetailsService.java
+│     │  │              ├─ dto
+│     │  │              │  └─ UserContext.java
 │     │  │              ├─ resolver
+│     │  │              │  └─ CurrentUserArgumentResolver.java
 │     │  │              ├─ SecurityConfiguration.java
-│     │  │              └─ SecurityService.java
+│     │  │              └─ service
+│     │  │                 └─ SecurityService.java
 │     │  └─ resources
 │     │     ├─ application.yaml
 │     │     ├─ static
@@ -290,7 +298,24 @@ bds360-backend
 │     │  │           │     │  └─ TransactionSpecification.java
 │     │  │           │     └─ util
 │     │  │           │        └─ VnPayUtil.java
-│     │  │           └─ PaymentServiceApplication.java
+│     │  │           ├─ PaymentServiceApplication.java
+│     │  │           └─ security
+│     │  │              ├─ annotation
+│     │  │              │  ├─ CurrentUser.java
+│     │  │              │  ├─ IsAdmin.java
+│     │  │              │  ├─ IsAdminOrModerator.java
+│     │  │              │  └─ RequireLogin.java
+│     │  │              ├─ config
+│     │  │              │  ├─ JwtProperties.java
+│     │  │              │  └─ WebMvcConfig.java
+│     │  │              ├─ CustomAccessDeniedHandler.java
+│     │  │              ├─ CustomAuthenticationEntryPoint.java
+│     │  │              ├─ dto
+│     │  │              │  └─ UserContext.java
+│     │  │              ├─ resolver
+│     │  │              │  └─ CurrentUserArgumentResolver.java
+│     │  │              ├─ SecurityConfiguration.java
+│     │  │              └─ SecurityService.java
 │     │  └─ resources
 │     │     ├─ application.yml
 │     │     ├─ static

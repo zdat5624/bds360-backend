@@ -26,7 +26,7 @@ import com.example.identity_service.modules.user.mapper.VerificationMapper;
 import com.example.identity_service.modules.user.repository.UserRepository;
 import com.example.identity_service.modules.user.repository.VerificationSubmissionRepository;
 import com.example.identity_service.modules.user.specification.VerificationSpecification;
-import com.example.identity_service.security.SecurityService;
+import com.example.identity_service.security.service.SecurityService;
 
 import lombok.RequiredArgsConstructor;
 

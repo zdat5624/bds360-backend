@@ -20,10 +20,10 @@ import com.example.identity_service.modules.auth.dto.response.AuthResponse;
 import com.example.identity_service.modules.auth.service.AuthService;
 import com.example.identity_service.modules.auth.service.ForgotPasswordService;
 import com.example.identity_service.modules.user.dto.response.UserResponse;
-import com.example.identity_service.modules.user.entity.User;
 import com.example.identity_service.modules.user.service.UserService;
 import com.example.identity_service.security.annotation.CurrentUser;
 import com.example.identity_service.security.annotation.RequireLogin;
+import com.example.identity_service.security.dto.UserContext;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -49,7 +49,7 @@ public class AuthController {
     @GetMapping("/account")
     @ResponseStatus(HttpStatus.OK)
     @RequireLogin
-    public ApiResponse<UserResponse> getAccount(@CurrentUser User user) {
+    public ApiResponse<UserResponse> getAccount(@CurrentUser UserContext user) {
         System.out.println("User email from @CurrentUser: " + user.getEmail());
         return ApiResponse.success(authService.getAccount(user.getEmail()), "Lấy thông tin tài khoản thành công");
     }
@@ -78,8 +78,8 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @RequireLogin
     public ApiResponse<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-            @CurrentUser User user) {
-
+            @CurrentUser UserContext user) {
+        System.out.println(">>> User Context: " + user.toString());
         userService.changePassword(user.getEmail(), request.getCurrentPassword(), request.getNewPassword());
         return ApiResponse.success(null, "Đổi mật khẩu thành công.");
     }

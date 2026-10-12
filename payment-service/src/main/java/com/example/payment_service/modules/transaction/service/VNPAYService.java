@@ -3,8 +3,6 @@ package com.example.payment_service.modules.transaction.service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -14,15 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.management.Notification;
-
 import org.springframework.stereotype.Service;
 
-import com.example.payment_service.common.constant.NotificationType;
 import com.example.payment_service.common.exception.AppException;
 import com.example.payment_service.common.exception.ErrorCode;
-import com.example.payment_service.modules.email.service.EmailService;
-import com.example.payment_service.modules.notification.service.NotificationService;
 import com.example.payment_service.modules.transaction.config.VnPayProperties;
 import com.example.payment_service.modules.transaction.constant.TransactionStatus;
 import com.example.payment_service.modules.transaction.constant.TransactionType;
@@ -30,7 +23,7 @@ import com.example.payment_service.modules.transaction.dto.response.PaymentLinkR
 import com.example.payment_service.modules.transaction.entity.Transaction;
 import com.example.payment_service.modules.transaction.repository.TransactionRepository;
 import com.example.payment_service.modules.transaction.util.VnPayUtil;
-import com.example.payment_service.modules.user.repository.UserRepository;
+import com.example.payment_service.security.dto.UserContext;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,16 +35,16 @@ import lombok.extern.slf4j.Slf4j;
 public class VNPAYService {
 
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
-    private final EmailService emailService;
-    private final NotificationService notificationService;
+    // private final UserRepository userRepository;
+    // private final EmailService emailService;
+    // private final NotificationService notificationService;
     private final VnPayProperties vnPayProperties;
 
     // ==========================================
     // 1. TẠO LINK THANH TOÁN
     // ==========================================
 
-    public PaymentLinkResponse createVNPayLink(User user, long inputAmount, String ipAdress) {
+    public PaymentLinkResponse createVNPayLink(UserContext userContext, long inputAmount, String ipAdress) {
         long amount = inputAmount * 100;
 
         // Mã giao dịch ngẫu nhiên
@@ -112,10 +105,14 @@ public class VNPAYService {
         transaction.setAmount(inputAmount);
         transaction.setStatus(TransactionStatus.PENDING);
         transaction.setDescription("Giao dịch nạp tiền đang chờ thanh toán");
-        transaction.setUser(user);
+
         transaction.setPaymentLink(paymentUrl);
         transaction.setTxnId(vnp_TxnRef);
         transaction.setType(TransactionType.DEPOSIT);
+
+        transaction.setUserId(userContext.getId());
+        transaction.setUserEmail(userContext.getEmail());
+        transaction.setUserName(userContext.getName());
 
         transactionRepository.save(transaction);
 
@@ -171,38 +168,49 @@ public class VNPAYService {
     // ==========================================
 
     private void processSuccessfulTransaction(Transaction transaction, String description) {
-        User user = transaction.getUser();
-        user.setBalance(user.getBalance() + transaction.getAmount());
-        userRepository.save(user);
+        // User user = transaction.getUser();
+        // user.setBalance(user.getBalance() + transaction.getAmount());
+        // userRepository.save(user);
 
-        // Tạo thông báo in-app
-        Notification notification = new Notification();
-        notification.setUser(user);
-        notification.setRead(false);
-        notification.setType(NotificationType.TRANSACTION);
-        notification.setMessage(description + ", tài khoản của bạn được cộng " + transaction.getAmount() + " VNĐ");
-        notificationService.createNotification(notification.getUser().getId(), notification.getMessage(),
-                notification.getType());
+        // // Tạo thông báo in-app
+        // Notification notification = new Notification();
+        // notification.setUser(user);
+        // notification.setRead(false);
+        // notification.setType(NotificationType.TRANSACTION);
+        // notification.setMessage(description + ", tài khoản của bạn được cộng " +
+        // transaction.getAmount() + " VNĐ");
+        // notificationService.createNotification(notification.getUser().getId(),
+        // notification.getMessage(),
+        // notification.getType());
 
-        // Gửi Email
-        String transactionTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-        emailService.sendDepositSuccessEmail(user.getEmail(), user.getName(), transaction.getAmount(), transactionTime);
+        // // Gửi Email
+        // String transactionTime =
+        // LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy
+        // HH:mm:ss"));
+        // emailService.sendDepositSuccessEmail(user.getEmail(), user.getName(),
+        // transaction.getAmount(), transactionTime);
+        log.info("Giao dịch thành công: UserId = {}, Amount = {}", transaction.getUserId(), transaction.getAmount());
     }
 
     private void processFailedTransaction(Transaction transaction, String description, String statusCode) {
-        Notification notification = new Notification();
-        notification.setUser(transaction.getUser());
-        notification.setRead(false);
-        notification.setType(NotificationType.TRANSACTION);
+        // Notification notification = new Notification();
+        // notification.setUser(transaction.getUser());
+        // notification.setRead(false);
+        // notification.setType(NotificationType.TRANSACTION);
 
-        if ("02".equals(statusCode)) {
-            notification.setMessage("Giao dịch nạp tiền qua VNPAY (" + transaction.getTxnId() + ") của bạn đã bị hủy.");
-        } else {
-            notification.setMessage("Giao dịch nạp tiền qua VNPAY (" + transaction.getTxnId() + ") không thể hoàn tất: "
-                    + description + ". Vui lòng thử lại.");
-        }
-        notificationService.createNotification(notification.getUser().getId(), notification.getMessage(),
-                notification.getType());
+        // if ("02".equals(statusCode)) {
+        // notification.setMessage("Giao dịch nạp tiền qua VNPAY (" +
+        // transaction.getTxnId() + ") của bạn đã bị hủy.");
+        // } else {
+        // notification.setMessage("Giao dịch nạp tiền qua VNPAY (" +
+        // transaction.getTxnId() + ") không thể hoàn tất: "
+        // + description + ". Vui lòng thử lại.");
+        // }
+        // notificationService.createNotification(notification.getUser().getId(),
+        // notification.getMessage(),
+        // notification.getType());
+
+        log.warn("Giao dịch thất bại: UserId = {}, Reason = {}", transaction.getUserId(), description);
     }
 
     private String getTransactionDescription(String statusCode, String txnId) {

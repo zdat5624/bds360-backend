@@ -21,8 +21,7 @@ public class OpenApiConfig {
 
     @PostConstruct
     public void init() {
-        // 1. Dạy Swagger bỏ qua tham số @CurrentUser để không bị lỗi 500 (Infinite
-        // Recursion)
+
         SpringDocUtils.getConfig().addAnnotationsToIgnore(CurrentUser.class);
     }
 }

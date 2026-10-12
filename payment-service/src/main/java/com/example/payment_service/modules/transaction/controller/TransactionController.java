@@ -17,6 +17,7 @@ import com.example.payment_service.modules.transaction.service.TransactionServic
 import com.example.payment_service.security.annotation.CurrentUser;
 import com.example.payment_service.security.annotation.IsAdmin;
 import com.example.payment_service.security.annotation.RequireLogin;
+import com.example.payment_service.security.dto.UserContext;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -50,11 +51,11 @@ public class TransactionController {
     @ResponseStatus(HttpStatus.OK)
     @RequireLogin
     public ApiResponse<PageResponse<TransactionResponse>> getMyTransactions(
-            @CurrentUser User user,
+            @CurrentUser UserContext user,
             @Valid @ModelAttribute TransactionFilterRequest filter) {
 
         // Truyền thẳng User hoặc UserID xuống Service
-        return ApiResponse.success(transactionService.getCurrentUserTransactions(user, filter),
+        return ApiResponse.success(transactionService.getCurrentUserTransactions(user.getId(), filter),
                 "Lấy lịch sử giao dịch cá nhân thành công");
     }
 
@@ -66,7 +67,7 @@ public class TransactionController {
     @RequireLogin
     public ApiResponse<TransactionResponse> getTransactionById(
             @PathVariable Long id,
-            @CurrentUser User user) {
+            @CurrentUser UserContext user) {
 
         return ApiResponse.success(transactionService.getTransactionById(id, user),
                 "Lấy chi tiết giao dịch thành công");

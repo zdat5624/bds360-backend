@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.Specification;
 import com.example.payment_service.modules.transaction.dto.request.TransactionFilterRequest;
 import com.example.payment_service.modules.transaction.entity.Transaction;
 
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 
 public class TransactionSpecification {
@@ -17,16 +16,14 @@ public class TransactionSpecification {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // 1. Phân quyền: Lọc theo User đang đăng nhập (Dành cho API My-Transactions)
+            // 1. Lọc theo User đang đăng nhập (So sánh thẳng với cột userId)
             if (targetUserId != null) {
-                predicates.add(cb.equal(root.get("user").get("id"), targetUserId));
+                predicates.add(cb.equal(root.get("userId"), targetUserId));
             }
 
-            // 2. Lọc theo Email (Dành cho Admin)
+            // 2. Lọc theo Email (Không cần Join nữa, cực kỳ nhanh)
             if (filter.getEmail() != null && !filter.getEmail().trim().isEmpty()) {
-                // Tối ưu hóa: Dùng Join để query sang bảng User thay vì get liên tiếp
-                Join<Transaction, User> userJoin = root.join("user");
-                predicates.add(cb.equal(userJoin.get("email"), filter.getEmail().trim()));
+                predicates.add(cb.equal(root.get("userEmail"), filter.getEmail().trim()));
             }
 
             // 3. Lọc theo ID giao dịch nội bộ

@@ -6,7 +6,7 @@ import java.util.List;
 import com.example.identity_service.common.constant.Role;
 import com.example.identity_service.modules.auth.entity.PasswordResetToken;
 import com.example.identity_service.modules.user.constant.Gender;
-import com.example.identity_service.security.SecurityService;
+import com.example.identity_service.security.service.SecurityService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
