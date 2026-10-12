@@ -1,18 +1,36 @@
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filter/global-exception.filter';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Bật CORS để cho phép các service khác hoặc Gateway gọi vào
   app.enableCors();
 
-  // Kích hoạt Validation tự động cho các DTO
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  // Cấu hình ValidationPipe tự chuẩn hóa mảng lỗi ngay từ đầu
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      exceptionFactory: (errors) => {
+        const formattedErrors = errors.map((err) => ({
+          field: err.property,
+          message: Object.values(err.constraints || {})[0] || 'Dữ liệu không hợp lệ',
+        }));
+        return new BadRequestException(formattedErrors);
+      },
+    }),
+  );
 
-  // Đặt tiền tố chung cho API (tùy chọn, ví dụ: /api/v1)
   app.setGlobalPrefix('api/v1');
+  
+  // Đăng ký Bắt lỗi toàn cục
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  
+  // Đăng ký Gói Response thành công toàn cục
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   const PORT = process.env.PORT || 3001;
   await app.listen(PORT);

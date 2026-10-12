@@ -1,19 +1,111 @@
-server:
-  port: 8082 # Cổng cho REST API thông thường gọi từ Gateway
-
+# ==========================================
+# CẤU HÌNH CHUNG VÀ MẶC ĐỊNH
+# ==========================================
 spring:
-  datasource:
-    # Nếu đang chạy local chưa qua docker thì dùng localhost, 
-    # Nếu chạy qua docker-compose thì thay localhost bằng tên service database (vd: mysql-db)
-    url: jdbc:mysql://localhost:3306/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+  application:
+    name: listing-service
+  profiles:
+    active: local # Mặc định chạy ở môi trường local
+
+server:
+  port: 8082
+
+grpc:
+  server:
+    port: 9092
+
+# ==========================================
+# CẤU HÌNH JWT BẢO MẬT (Dùng chung cho cả local và prod)
+# ==========================================
+api:
+  jwt:
+    token-validity-in-seconds: 86400000
+
+# ==========================================
+# CẤU HÌNH JPA / HIBERNATE CHUNG
+# ==========================================
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          batch_size: 1000
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
 
-# Cấu hình thư viện net.devh.boot.grpc
-grpc:
-  server:
-    port: 9092 # Cổng chuyên dụng để các service khác gọi gRPC tới
+# ==========================================
+# CẤU HÌNH HIKARI CONNECTION POOL
+# ==========================================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+---
+# ==========================================
+# PROFILE: LOCAL (Môi trường phát triển)
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: 123456 # Sửa lại password root nếu máy bạn dùng pass khác
+
+app:
+  url:
+    backend: http://localhost:8080
+    frontend: http://localhost:3000
+
+api:
+  jwt:
+    base64-secret: ***REMOVED***
+
+mapbox:
+  api:
+    key: ***REMOVED***
+
+---
+# ==========================================
+# PROFILE: PROD (Môi trường Production - Render/Docker)
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    # Trên docker-compose, bạn trỏ URL về database container (vd: mysql-db)
+    # Trên Render, nó sẽ tự nội suy giá trị từ biến môi trường
+    url: ${DB_URL:jdbc:mysql://mysql-db:3306/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+
+# Mở kết nối ra ngoài internet (Bắt buộc trên Render)
+server:
+  address: 0.0.0.0
+  port: ${PORT:8082}
+
+app:
+  url:
+    backend: ${BACKEND_URL:http://localhost:8080}
+    frontend: ${FRONTEND_URL:http://localhost:3000}
+
+api:
+  jwt:
+    base64-secret: ${JWT_SECRET}
+
+mapbox:
+  api:
+    key: ${MAPBOX_API_KEY}
