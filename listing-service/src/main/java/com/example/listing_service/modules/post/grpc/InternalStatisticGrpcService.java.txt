@@ -2,9 +2,9 @@ package com.example.listing_service.modules.post.grpc;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import vn.bds360.backend.grpc.EmptyRequest;
-import vn.bds360.backend.grpc.InternalStatisticServiceGrpc;
-import vn.bds360.backend.grpc.PostCountResponse;
+import com.example.payment_service.grpc.EmptyRequest;
+import com.example.payment_service.grpc.InternalStatisticServiceGrpc;
+import com.example.payment_service.grpc.PostCountResponse;
 
 @GrpcService
 public class InternalStatisticGrpcService extends InternalStatisticServiceGrpc.InternalStatisticServiceImplBase {

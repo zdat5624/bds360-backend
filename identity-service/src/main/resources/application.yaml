@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  main:
+      lazy-initialization: true
   application:
     name: identity-service
   datasource:
@@ -23,6 +25,7 @@ grpc:
   server:
     port: 9091
 
+#./gradlew compileJava -t --build-cache --parallel
 # Cấu hình JWT map trực tiếp với JwtProperties.java
 api:
   jwt:

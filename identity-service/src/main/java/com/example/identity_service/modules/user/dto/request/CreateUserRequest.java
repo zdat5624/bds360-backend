@@ -1,4 +1,4 @@
-// vn.bds360.backend.modules.user.dto.request.CreateUserRequest.java
+// com.example.payment_service.modules.user.dto.request.CreateUserRequest.java
 
 package com.example.identity_service.modules.user.dto.request;
 

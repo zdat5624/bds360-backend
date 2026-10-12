@@ -3,7 +3,7 @@ syntax = "proto3";
 package bds360;
 
 option java_multiple_files = true;
-option java_package = "vn.bds360.backend.grpc";
+option java_package = "com.example.payment_service.grpc";
 option csharp_namespace = "Bds360.Grpc";
 
 // Service cũ của Listing / Statistic
