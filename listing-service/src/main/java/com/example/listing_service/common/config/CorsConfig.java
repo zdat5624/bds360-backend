@@ -1,4 +1,4 @@
-package com.example.payment_service.common.config;
+package com.example.listing_service.common.config;
 
 import java.util.Arrays;
 import java.util.List;

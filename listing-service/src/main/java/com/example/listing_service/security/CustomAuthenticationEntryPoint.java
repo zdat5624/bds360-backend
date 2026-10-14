@@ -1,4 +1,4 @@
-package com.example.payment_service.security;
+package com.example.listing_service.security;
 
 import java.io.IOException;
 
@@ -6,8 +6,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.example.payment_service.common.dto.response.ApiResponse;
-import com.example.payment_service.common.exception.ErrorCode;
+import com.example.listing_service.common.dto.response.ApiResponse;
+import com.example.listing_service.common.exception.ErrorCode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

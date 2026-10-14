@@ -10,7 +10,6 @@ import com.example.listing_service.modules.address.entity.Ward;
 import com.example.listing_service.modules.category.entity.Category;
 import com.example.listing_service.modules.post.constant.PostStatus;
 import com.example.listing_service.modules.vip.entity.Vip;
-// Không còn import User entity nữa!
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -54,6 +53,8 @@ public class Post {
     @Column(columnDefinition = "MEDIUMTEXT")
     @NotBlank(message = "Mô tả không được để trống")
     private String description;
+
+    private Boolean notifyOnView = false;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Loại tin đăng không được để trống")

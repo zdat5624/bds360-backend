@@ -1,10 +1,10 @@
 import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AppException } from '../exception/app.exception';
@@ -75,6 +75,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         code = ErrorCode.FORBIDDEN.code;
       } else if (status === 404) {
         code = ErrorCode.API_NOT_FOUND.code;
+      } else if (status === 413) { 
+        code = ErrorCode.FILE_TOO_LARGE.code; // 🌟 Bổ sung dòng này
+      } else if (status === 415) {
+        code = ErrorCode.FILE_FORMAT_INVALID.code; // 🌟 Bổ sung cho an toàn
       } else if (status >= 500) {
         code = ErrorCode.INTERNAL_ERROR.code;
       }

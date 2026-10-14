@@ -13,7 +13,8 @@ export const ErrorCode = {
   INVALID_PARAMETER: new ErrorCodeDetail(10003, 400, 'Tham số truyền vào thiếu hoặc không hợp lệ.'),
   UNAUTHORIZED: new ErrorCodeDetail(10004, 401, 'Chưa xác thực hoặc token không hợp lệ.'),
   FORBIDDEN: new ErrorCodeDetail(10005, 403, 'Bạn không có quyền truy cập vào tài nguyên này.'),
-  API_NOT_FOUND: new ErrorCodeDetail(10006, 404, 'Đường dẫn API không tồn tại trên hệ thống.'), // 🌟 Bổ sung 10006
+  API_NOT_FOUND: new ErrorCodeDetail(10006, 404, 'Đường dẫn API không tồn tại trên hệ thống.'), 
+  MISSING_FILE: new ErrorCodeDetail(10010, 400, 'Request không chứa file hoặc sai định dạng multipart/form-data.'),
 
   // 16. MEDIA
   FILE_TOO_LARGE: new ErrorCodeDetail(16001, 413, 'Kích thước file vượt quá mức cho phép.'),

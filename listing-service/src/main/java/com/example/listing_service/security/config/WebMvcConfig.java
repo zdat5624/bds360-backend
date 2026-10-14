@@ -1,4 +1,4 @@
-package com.example.payment_service.security.config;
+package com.example.listing_service.security.config;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.example.payment_service.security.resolver.CurrentUserArgumentResolver;
+import com.example.listing_service.security.resolver.CurrentUserArgumentResolver;
 
 import lombok.RequiredArgsConstructor;
 

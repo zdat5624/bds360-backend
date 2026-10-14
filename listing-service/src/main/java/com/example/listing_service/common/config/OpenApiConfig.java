@@ -1,9 +1,9 @@
-package com.example.payment_service.common.config;
+package com.example.listing_service.common.config;
 
 import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Configuration;
 
-import com.example.payment_service.security.annotation.CurrentUser;
+import com.example.listing_service.security.annotation.CurrentUser;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;

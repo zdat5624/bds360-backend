@@ -1,6 +1,6 @@
-package com.example.payment_service.security.dto;
+package com.example.listing_service.security.dto;
 
-import com.example.payment_service.common.constant.Role;
+import com.example.listing_service.common.constant.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

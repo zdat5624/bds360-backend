@@ -1,4 +1,4 @@
-package com.example.payment_service.security.annotation;
+package com.example.listing_service.security.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

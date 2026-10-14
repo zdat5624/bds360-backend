@@ -7,23 +7,6 @@ spring:
   profiles:
     active: local # Mặc định chạy ở môi trường local
 
-server:
-  port: 8082
-
-grpc:
-  server:
-    port: 9092
-
-# ==========================================
-# CẤU HÌNH JWT BẢO MẬT (Dùng chung cho cả local và prod)
-# ==========================================
-api:
-  jwt:
-    token-validity-in-seconds: 86400000
-
-# ==========================================
-# CẤU HÌNH JPA / HIBERNATE CHUNG
-# ==========================================
   jpa:
     hibernate:
       ddl-auto: update
@@ -31,15 +14,11 @@ api:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        jdbc:
-          batch_size: 1000
-          batch_versioned_data: true
-        order_inserts: true
-        order_updates: true
+        '[jdbc.batch_size]': 1000
+        '[jdbc.batch_versioned_data]': true
+        '[order_inserts]': true
+        '[order_updates]': true
 
-# ==========================================
-# CẤU HÌNH HIKARI CONNECTION POOL
-# ==========================================
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
@@ -48,6 +27,17 @@ api:
       idle-timeout: 30000
       max-lifetime: 1800000
       connection-timeout: 30000
+
+server:
+  port: 8082
+
+grpc:
+  server:
+    port: 9092
+
+api:
+  jwt:
+    token-validity-in-seconds: 86400000
 
 ---
 # ==========================================
@@ -59,9 +49,11 @@ spring:
       on-profile: local
 
   datasource:
-    url: jdbc:mysql://localhost:3306/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    # 🌟 FIX TẠI ĐÂY: Hỗ trợ nhận biến môi trường DB_URL từ Docker. 
+    # Nếu không có (chạy trực tiếp trên máy host), nó sẽ dùng cổng 3307.
+    url: ${DB_URL:jdbc:mysql://localhost:3307/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
     username: root
-    password: 123456 # Sửa lại password root nếu máy bạn dùng pass khác
+    password: root
 
 app:
   url:
@@ -86,8 +78,6 @@ spring:
       on-profile: prod
 
   datasource:
-    # Trên docker-compose, bạn trỏ URL về database container (vd: mysql-db)
-    # Trên Render, nó sẽ tự nội suy giá trị từ biến môi trường
     url: ${DB_URL:jdbc:mysql://mysql-db:3306/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}

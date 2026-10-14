@@ -1,8 +1,8 @@
 import {
-    Controller,
-    Post,
-    UploadedFiles,
-    UseInterceptors,
+  Controller,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import 'multer';
@@ -41,8 +41,8 @@ export class MediaController {
 
   private validateEmptyFiles(files: Express.Multer.File[]) {
     if (!files || files.length === 0 || !files[0]) {
-      // Dùng AppException và mã ErrorCode chuẩn của hệ thống
-      throw new AppException(ErrorCode.INVALID_PARAMETER);
+      // 🌟 Đổi sang MISSING_FILE
+      throw new AppException(ErrorCode.MISSING_FILE);
     }
   }
 }

@@ -1,4 +1,4 @@
-package com.example.payment_service.common.constant;
+package com.example.listing_service.common.constant;
 
 public enum NotificationType {
     POST, // thông báo liên quan về post

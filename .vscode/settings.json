@@ -1,3 +1,4 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "js/ts.tsdk.path": "notification-service/node_modules/typescript/lib"
 }

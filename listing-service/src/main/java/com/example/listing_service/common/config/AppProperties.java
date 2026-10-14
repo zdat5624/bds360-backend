@@ -1,4 +1,4 @@
-package com.example.payment_service.common.config;
+package com.example.listing_service.common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

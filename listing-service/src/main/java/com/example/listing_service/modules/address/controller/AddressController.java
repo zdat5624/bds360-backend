@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.listing_service.common.annotation.ApiGlobalResponse;
+import com.example.listing_service.common.dto.response.ApiResponse;
 import com.example.listing_service.modules.address.dto.response.CoordinateResponse;
 import com.example.listing_service.modules.address.dto.response.DistrictResponse;
 import com.example.listing_service.modules.address.dto.response.ProvinceResponse;
@@ -17,7 +19,6 @@ import com.example.listing_service.modules.address.service.AddressService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import vn.bds360.backend.common.annotation.ApiGlobalResponse;
 
 @RestController
 @RequestMapping("/api/v1")

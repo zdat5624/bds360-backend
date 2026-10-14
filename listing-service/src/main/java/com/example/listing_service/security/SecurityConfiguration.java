@@ -1,4 +1,4 @@
-package com.example.payment_service.security;
+package com.example.listing_service.security;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.example.payment_service.security.config.JwtProperties;
+import com.example.listing_service.security.config.JwtProperties;
 import com.nimbusds.jose.util.Base64;
 
 import lombok.RequiredArgsConstructor;

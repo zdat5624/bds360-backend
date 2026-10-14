@@ -14,7 +14,7 @@ import com.example.listing_service.modules.address.config.MapboxConfig;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;import package com.example.listing_service.modules.address.config.MapboxConfig;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor

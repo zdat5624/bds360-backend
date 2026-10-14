@@ -1,4 +1,4 @@
-package com.example.payment_service.common.mapper;
+package com.example.listing_service.common.mapper;
 
 import org.mapstruct.Named;
 import org.mapstruct.TargetType;

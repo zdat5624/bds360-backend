@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	// security
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
