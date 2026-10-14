@@ -28,9 +28,9 @@ export class MediaService implements OnModuleInit {
 
   onModuleInit() {
     cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dwdehgtoq',
-      api_key: process.env.CLOUDINARY_API_KEY || '399594327697784',
-      api_secret: process.env.CLOUDINARY_API_SECRET || 'Hb-lviqId-8UdQxUBp12RDOBLiY',
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'ko co_clound_name',
+      api_key: process.env.CLOUDINARY_API_KEY || 'ko_co_api_key',
+      api_secret: process.env.CLOUDINARY_API_SECRET || 'ko_co_secret',
     });
     this.logger.log('>>> Đã khởi tạo Cloudinary SDK thành công!');
   }
