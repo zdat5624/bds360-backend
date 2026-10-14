@@ -1,6 +1,7 @@
 
 ```
 bds360-backend
+├─ .env
 ├─ api-gateway
 │  ├─ gradle
 │  │  └─ wrapper
@@ -348,8 +349,10 @@ bds360-backend
 │  │  │  │  └─ error-code.enum.ts
 │  │  │  ├─ filter
 │  │  │  │  └─ global-exception.filter.ts
-│  │  │  └─ interceptor
-│  │  │     └─ transform.interceptor.ts
+│  │  │  ├─ interceptor
+│  │  │  │  └─ transform.interceptor.ts
+│  │  │  └─ pipe
+│  │  │     └─ custom-validation.pipe.ts
 │  │  ├─ main.ts
 │  │  └─ modules
 │  │     └─ media
@@ -361,17 +364,48 @@ bds360-backend
 │  │  └─ jest-e2e.json
 │  └─ tsconfig.json
 ├─ notification-service
+│  ├─ .env
 │  ├─ .prettierrc
 │  ├─ eslint.config.mjs
 │  ├─ nest-cli.json
 │  ├─ package-lock.json
 │  ├─ package.json
 │  ├─ README.md
+│  ├─ README_PROJECT_TREE.md
 │  ├─ src
 │  │  ├─ app.controller.ts
 │  │  ├─ app.module.ts
 │  │  ├─ app.service.ts
-│  │  └─ main.ts
+│  │  ├─ common
+│  │  │  ├─ dto
+│  │  │  │  ├─ request
+│  │  │  │  │  └─ base-filter.request.ts
+│  │  │  │  └─ response
+│  │  │  │     ├─ api.response.ts
+│  │  │  │     └─ page.response.ts
+│  │  │  ├─ exception
+│  │  │  │  ├─ app.exception.ts
+│  │  │  │  └─ error-code.enum.ts
+│  │  │  ├─ filter
+│  │  │  │  └─ global-exception.filter.ts
+│  │  │  ├─ interceptor
+│  │  │  │  └─ transform.interceptor.ts
+│  │  │  └─ pipe
+│  │  │     └─ custom-validation.pipe.ts
+│  │  ├─ main.ts
+│  │  └─ modules
+│  │     └─ notification
+│  │        ├─ dto
+│  │        │  └─ request
+│  │        │     ├─ create-notification.request.ts
+│  │        │     ├─ notification-filter.request.ts
+│  │        │     └─ view-phone-notification.request.ts
+│  │        ├─ entity
+│  │        │  └─ notification.entity.ts
+│  │        ├─ notification.controller.ts
+│  │        ├─ notification.gateway.ts
+│  │        ├─ notification.module.ts
+│  │        └─ notification.service.ts
 │  ├─ test
 │  │  ├─ app.e2e-spec.ts
 │  │  └─ jest-e2e.json

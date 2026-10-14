@@ -7,8 +7,8 @@ services:
   mysql-db:
     image: mysql:8.0
     container_name: bds360_mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
+    env_file:
+      - .env
     ports:
       - "3307:3306"
     volumes:
@@ -29,9 +29,11 @@ services:
     working_dir: /app
     ports:
       - "3001:3001"
+    env_file:
+      - .env
     volumes:
       - ./media-service:/app
-      - /app/node_modules # Cách ly node_modules khỏi Windows
+      - /app/node_modules
     command: sh -c "npm install && npm run start:dev"
 
   notification-service:
@@ -40,27 +42,28 @@ services:
     working_dir: /app
     ports:
       - "3002:3002"
-      - "9093:9093" # Port gRPC cho Spring Boot gọi qua
+      - "9093:9093"
+    env_file:
+      - .env # Nạp biến từ .env
     volumes:
       - ./notification-service:/app
       - /app/node_modules
-
     environment:
       - DB_HOST=mysql-db
       - DB_PORT=3306
       - DB_USERNAME=root
-      - DB_PASSWORD=root
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - DB_DATABASE=${MYSQL_DATABASE_NOTIFICATION}
     command: sh -c "npm install && npm run start:dev"
-    # 🌟 FIX TẠI ĐÂY: Đợi DB sẵn sàng mới chạy (giống các service Spring Boot)
     depends_on:
       mysql-db:
         condition: service_healthy
 
   # ==========================================
-  # 3. .NET SERVICE (C#) - Hot Reload (dotnet watch)
+  # 3. .NET SERVICE (C#) - Hot Reload
   # ==========================================
   statistic-service:
-    image: mcr.microsoft.com/dotnet/sdk:9.0 # Dùng SDK để có tính năng Watch
+    image: mcr.microsoft.com/dotnet/sdk:9.0
     container_name: bds360_statistic
     working_dir: /app
     ports:
@@ -73,7 +76,7 @@ services:
     command: dotnet watch run --urls "http://0.0.0.0:5001"
 
   # ==========================================
-  # 4. SPRING BOOT SERVICES (Java) - Hot Reload (gradlew -t)
+  # 4. SPRING BOOT SERVICES (Java) - Hot Reload
   # ==========================================
   api-gateway:
     image: eclipse-temurin:21-jdk-alpine
@@ -92,11 +95,13 @@ services:
     working_dir: /app
     ports:
       - "8081:8081"
+    env_file:
+      - .env
     volumes:
       - ./identity-service:/app
       - identity_cache:/root/.gradle
     environment:
-      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_identity_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - DB_URL=jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE_IDENTITY}?createDatabaseIfNotExist=true&serverTimezone=UTC
     command: ./gradlew bootRun -t
     depends_on:
       mysql-db:
@@ -108,11 +113,13 @@ services:
     working_dir: /app
     ports:
       - "8082:8082"
+    env_file:
+      - .env
     volumes:
       - ./listing-service:/app
       - listing_cache:/root/.gradle
     environment:
-      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_listing_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - DB_URL=jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE_LISTING}?createDatabaseIfNotExist=true&serverTimezone=UTC
     command: ./gradlew bootRun -t
     depends_on:
       mysql-db:
@@ -124,11 +131,13 @@ services:
     working_dir: /app
     ports:
       - "8083:8083"
+    env_file:
+      - .env
     volumes:
       - ./payment-service:/app
       - payment_cache:/root/.gradle
     environment:
-      - DB_URL=jdbc:mysql://mysql-db:3306/bds360_payment_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - DB_URL=jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE_PAYMENT}?createDatabaseIfNotExist=true&serverTimezone=UTC
     command: ./gradlew bootRun -t
     depends_on:
       mysql-db:

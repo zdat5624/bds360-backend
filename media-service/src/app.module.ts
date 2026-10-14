@@ -7,7 +7,8 @@ import { MediaModule } from './modules/media/media.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Giúp biến .env dùng được ở mọi nơi trong project
+      isGlobal: true,
+      envFilePath: ['.env', '../.env'], // Lùi ra 1 cấp để tìm file bds360-backend/.env
     }),
     MediaModule,
   ],

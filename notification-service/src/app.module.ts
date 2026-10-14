@@ -10,8 +10,8 @@ import { NotificationModule } from './modules/notification/notification.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, 
+      envFilePath: ['.env', '../.env'], // Lùi ra 1 cấp để tìm file bds360-backend/.env
     }),
-    // 🌟 Dùng forRootAsync và inject ConfigService
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -23,7 +23,7 @@ import { NotificationModule } from './modules/notification/notification.module';
         password: configService.get<string>('DB_PASSWORD', 'root'),
         database: configService.get<string>('DB_DATABASE', 'bds360_notification_db'),
         entities: [Notification],
-        synchronize: true, // Lưu ý: Tắt (false) trên Production
+        synchronize: true,
       }),
     }),
     NotificationModule,

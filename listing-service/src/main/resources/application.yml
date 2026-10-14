@@ -5,7 +5,7 @@ spring:
   application:
     name: listing-service
   profiles:
-    active: local # Mặc định chạy ở môi trường local
+    active: local
 
   jpa:
     hibernate:
@@ -49,11 +49,10 @@ spring:
       on-profile: local
 
   datasource:
-    # 🌟 FIX TẠI ĐÂY: Hỗ trợ nhận biến môi trường DB_URL từ Docker. 
-    # Nếu không có (chạy trực tiếp trên máy host), nó sẽ dùng cổng 3307.
+    # Lấy DB_URL từ biến môi trường (được truyền từ Docker Compose)
     url: ${DB_URL:jdbc:mysql://localhost:3307/bds360_listing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
     username: root
-    password: root
+    password: ${MYSQL_ROOT_PASSWORD:root}
 
 app:
   url:
@@ -62,11 +61,13 @@ app:
 
 api:
   jwt:
-    base64-secret: ***REMOVED***
+    # Lấy JWT_SECRET từ biến môi trường
+    base64-secret: ${JWT_SECRET}
 
 mapbox:
   api:
-    key: ***REMOVED***
+    # Lấy MAPBOX_API_KEY từ biến môi trường
+    key: ${MAPBOX_API_KEY}
 
 ---
 # ==========================================
@@ -82,7 +83,6 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
 
-# Mở kết nối ra ngoài internet (Bắt buộc trên Render)
 server:
   address: 0.0.0.0
   port: ${PORT:8082}

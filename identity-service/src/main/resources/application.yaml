@@ -29,5 +29,5 @@ grpc:
 # Cấu hình JWT map trực tiếp với JwtProperties.java
 api:
   jwt:
-    base64-secret: ***REMOVED***
+    base64-secret: qoAEABDke07+AVLepXB4aCMtsT0wMAqR5x2VFyldsnx6e75YQkJH2UcZKTjEyoNgG71SBCXfq5N6NVZxWOfsHQ==
     token-validity-in-seconds: 3600000
