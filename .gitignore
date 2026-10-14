@@ -1,6 +1,7 @@
 # Gradle
 .gradle/
 **/build/
+build/
 # Bỏ qua tất cả file .env
 .env
 .env.*
