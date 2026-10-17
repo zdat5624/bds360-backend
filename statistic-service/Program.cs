@@ -1,32 +1,40 @@
-
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization; // 🌟 Bổ sung thư viện này ở đầu file
+using StatisticService.Common.Configs;
+using StatisticService.Common.Exceptions;
+using StatisticService.Security.Extensions;
+using StatisticService.Security.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // serialize enum thành string, tránh trả về số
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+// 1. Load và check file .env
+builder.Services.AddAppConfigurations(builder.Configuration);
+
+// 2. Setup JWT (Truyền cấu hình vào đây)
+builder.Services.AddCustomJwtAuthentication(builder.Configuration);
+
+// 3. Setup Services
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
-// Tạo 1 REST API bên C# để test gọi gRPC sang Java
-app.MapGet("/api/v1/statistics/test-grpc", async () =>
-{
-    try
-    {
-        // 1. Mở kênh kết nối thẳng tới cổng 9092 của Listing Service (Java)
-        // using var channel = GrpcChannel.ForAddress("http://localhost:9092");
-
-        // // 2. Khởi tạo Client dựa trên Service đã định nghĩa trong file .proto
-        // var client = new InternalStatisticService.InternalStatisticServiceClient(channel);
-
-        // // 3. Gọi hàm GetTotalPostsAsync (C# tự động thêm chữ Async vào cuối tên hàm)
-        // var reply = await client.GetTotalPostsAsync(new EmptyRequest());
-
-        // 4. Trả về kết quả JSON cho trình duyệt
-        return Results.Ok(new {
-            message = "Thành công! C# đã lấy được dữ liệu từ Java qua gRPC.",
-            totalPostsFromJava = 1111
-        });
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem($"Lỗi gọi gRPC: {ex.Message}");
-    }
-});
+app.UseExceptionHandler();
+app.UseRouting();
+app.UseMiddleware<CustomJwtMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
