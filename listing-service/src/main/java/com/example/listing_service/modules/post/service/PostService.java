@@ -86,7 +86,7 @@ public class PostService {
             isVip = vip.getVipLevel() > 0;
         }
 
-        long totalCost = request.getNumberOfDays() * costPerDay;
+        // long totalCost = request.getNumberOfDays() * costPerDay;
         // if (user.getBalance() < totalCost) {
         // throw new AppException(ErrorCode.BALANCE_NOT_ENOUGH);
         // }
@@ -719,7 +719,7 @@ public class PostService {
             isVip = post.getVip().getVipLevel() > 0;
         }
 
-        long totalCost = request.getNumberOfDays() * costPerDay;
+        // long totalCost = request.getNumberOfDays() * costPerDay;
 
         // if (user.getBalance() < totalCost) {
         // throw new AppException(ErrorCode.BALANCE_NOT_ENOUGH);

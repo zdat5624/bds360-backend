@@ -1,6 +1,0 @@
-rootProject.name = 'bds360-backend'
-
-include 'api-gateway'
-include 'identity-service'
-include 'listing-service'
-include 'payment-service'

@@ -1,58 +1,44 @@
 server:
-  port: 8080 # Cửa chính
+  port: 8080 # Cửa chính của toàn bộ hệ thống
 
 spring:
-  application:
-    name: api-gateway
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
-            allowedHeaders: "*"
+      server:
+        webflux:
+          routes:
+          # 1. Đi vào Identity Service (Java Spring Boot)
+          - id: identity-service
+            uri: http://identity-service:8081
+            predicates:
+              - Path=/api/v1/auth/**,/api/v1/users/**,/api/v1/admin/users/**,/api/v1/manage/verification-requests/**
 
-      routes:
-        # 1. Đi vào Identity Service
-        - id: identity-service
-          uri: http://identity-service:8081 # Lưu ý: nếu chạy trực tiếp trên máy không qua Docker compose thì đổi thành http://localhost:8081
-          predicates:
-            - Path=/api/v1/auth/**, /api/v1/users/**, /api/v1/admin/users/**, /api/v1/manage/verification-requests/**
+          # 2. Đi vào Listing Service (Java Spring Boot)
+          - id: listing-service
+            uri: http://listing-service:8082
+            predicates:
+              - Path=/api/v1/posts/**,/api/v1/categories/**,/api/v1/admin/posts/**
 
-        # 2. Đi vào Listing Service
-        - id: listing-service
-          uri: http://listing-service:8082
-          predicates:
-            - Path=/api/v1/posts/**, /api/v1/categories/**, /api/v1/admin/posts/**
+          # 3. Đi vào Payment Service (Java Spring Boot)
+          - id: payment-service
+            uri: http://payment-service:8083
+            predicates:
+              - Path=/api/v1/payments/**,/api/v1/transactions/**,/api/v1/admin/transactions/**
 
-        # 3. Đi vào Payment Service
-        - id: payment-service
-          uri: http://payment-service:8083
-          predicates:
-            # Bổ sung thêm /api/v1/admin/transactions/**
-            - Path=/api/v1/payments/**, /api/v1/transactions/**, /api/v1/admin/transactions/**
+          # 4. Đi vào Media Service (Node.js - NestJS)
+          - id: media-service
+            uri: http://media-service:3001
+            predicates:
+              - Path=/api/v1/media/**
 
-        # 4. Đi vào Media Service (NestJS)
-        - id: media-service
-          uri: http://media-service:3001
-          predicates:
-            - Path=/api/v1/media/**
+          # 5. Đi vào Notification Service (Node.js - NestJS)
+          - id: notification-service
+            uri: http://notification-service:3002
+            predicates:
+              - Path=/api/v1/notifications/**,/ws/**,/api/v1/email/**
 
-        # 5. Đi vào Notification Service (NestJS)
-        - id: notification-service
-          uri: http://notification-service:3002
-          predicates:
-            - Path=/api/v1/notifications/**
-
-        # 6. Đi vào Statistic Service (.NET)
-        - id: statistic-service
-          uri: http://statistic-service:5001
-          predicates:
-            - Path=/api/v1/statistics/**
+          # 6. Đi vào Statistic Service (C# - .NET)
+          - id: statistic-service
+            uri: http://statistic-service:5001
+            predicates:
+              - Path=/api/v1/statistics/**

@@ -63,13 +63,14 @@ services:
   # 3. .NET SERVICE (C#) - Hot Reload
   # ==========================================
   statistic-service:
-    image: mcr.microsoft.com/dotnet/sdk:9.0
+    image: mcr.microsoft.com/dotnet/sdk:10.0
     container_name: bds360_statistic
     working_dir: /app
     ports:
       - "5001:5001"
     volumes:
       - ./statistic-service:/app
+      - ./_shared:/_shared
     environment:
       - DOTNET_USE_POLLING_FILE_WATCHER=true
       - ASPNETCORE_ENVIRONMENT=Development

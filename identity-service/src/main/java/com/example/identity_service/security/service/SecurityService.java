@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import com.example.identity_service.modules.user.repository.UserRepository;
 import com.example.identity_service.security.CustomUserDetails;
 import com.example.identity_service.security.config.JwtProperties;
 
@@ -29,7 +28,6 @@ public class SecurityService {
 
     private final JwtEncoder jwtEncoder;
     private final JwtProperties jwtProperties;
-    private final UserRepository userRepository;
 
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 

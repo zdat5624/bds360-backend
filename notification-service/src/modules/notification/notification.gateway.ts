@@ -8,10 +8,10 @@ import {
 import { Server, Socket } from 'socket.io';
 
 // Endpoint /ws giống hệt Spring Boot cũ
-@WebSocketGateway({ path: '/ws', cors: { origin: '*' } })
+@WebSocketGateway({ path: '/ws' })
 export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server!: Server; // 🌟 FIX: Thêm dấu "!" để tắt lỗi khởi tạo
+  server!: Server;
 
   private readonly logger = new Logger(NotificationGateway.name);
 

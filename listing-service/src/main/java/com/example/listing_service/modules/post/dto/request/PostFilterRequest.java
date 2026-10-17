@@ -1,4 +1,4 @@
-// File: @/modules/post/dto/request/PostFilterRequest.java
+
 package com.example.listing_service.modules.post.dto.request;
 
 import java.util.ArrayList;

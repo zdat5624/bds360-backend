@@ -1,90 +1,88 @@
+import { CurrentUser } from '@/security/decorator/current-user.decorator';
 import {
   Body,
   Controller,
   Delete,
   Get,
-  Headers,
+  Logger,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { AppException } from '../../common/exception/app.exception';
-import { ErrorCode } from '../../common/exception/error-code.enum';
+import { PageResponse } from '../../common/dto/response/page.response';
+import { RequireLogin } from '../../security/decorator/auth.decorator';
+import { UserContext } from '../../security/dto/user-context.dto';
 import { CreateNotificationRequest } from './dto/request/create-notification.request';
 import { NotificationFilterRequest } from './dto/request/notification-filter.request';
 import { ViewPhoneNotificationRequest } from './dto/request/view-phone-notification.request';
+import { NotificationCountResponse } from './dto/response/notification-count.response';
+import { NotificationResponse } from './dto/response/notification.response';
 import { NotificationService } from './notification.service';
 
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) {}
-
-  private extractHeader(headers: Record<string, string | undefined>, key: string): string {
-    const value = headers[key];
-    if (!value && key === 'x-auth-user-id') {
-      throw new AppException(ErrorCode.UNAUTHORIZED);
-    }
-    return value ? String(value) : '';
-  }
-
-  private extractUserId(headers: Record<string, string | undefined>): number {
-    const userIdStr = this.extractHeader(headers, 'x-auth-user-id');
-    const parsedId = parseInt(userIdStr, 10);
-    if (isNaN(parsedId)) {
-      throw new AppException(ErrorCode.UNAUTHORIZED);
-    }
-    return parsedId;
-  }
+  constructor(private readonly notificationService: NotificationService) { }
 
   @Get()
+  @RequireLogin()
   async getMyNotifications(
-    @Headers() headers: Record<string, string | undefined>,
+    @CurrentUser() user: UserContext,
     @Query() filter: NotificationFilterRequest,
-  ) {
-    const userId = this.extractUserId(headers);
+  ): Promise<PageResponse<NotificationResponse>> {
     const isReadBool =
       filter.isRead === 'true' ? true : filter.isRead === 'false' ? false : undefined;
 
     return this.notificationService.getUserNotifications(
-      userId,
+      user.id,
       filter.page,
       filter.size,
-      filter.sortBy,         // 🌟 FIX: Truyền thêm sortBy
-      filter.sortDirection,  // 🌟 FIX: Truyền thêm sortDirection
+      filter.sortBy,
+      filter.sortDirection,
       isReadBool,
       filter.type,
     );
   }
 
   @Put('mark-as-read')
-  async markAsRead(@Headers() headers: Record<string, string | undefined>, @Body() ids: number[]) {
-    const userId = this.extractUserId(headers);
-    await this.notificationService.markAsRead(userId, ids);
+  @RequireLogin()
+  async markAsRead(
+    @CurrentUser() user: UserContext,
+    @Body() ids: number[],
+  ): Promise<null> {
+    await this.notificationService.markAsRead(user.id, ids);
     return null;
   }
 
   @Put('mark-all-as-read')
-  async markAllAsRead(@Headers() headers: Record<string, string | undefined>) {
-    const userId = this.extractUserId(headers);
-    await this.notificationService.markAllAsRead(userId);
+  @RequireLogin()
+  async markAllAsRead(@CurrentUser() user: UserContext): Promise<null> {
+    await this.notificationService.markAllAsRead(user.id);
     return null;
   }
 
   @Get('unread-counts')
-  async getUnreadCounts(@Headers() headers: Record<string, string | undefined>) {
-    const userId = this.extractUserId(headers);
-    return this.notificationService.getUnreadCountsByUserId(userId);
+  @RequireLogin()
+  async getUnreadCounts(
+    @CurrentUser() user: UserContext,
+  ): Promise<NotificationCountResponse[]> {
+    return this.notificationService.getUnreadCountsByUserId(user.id);
   }
 
   @Delete()
-  async deleteNotifications(@Headers() headers: Record<string, string | undefined>, @Body() ids: number[]) {
-    const userId = this.extractUserId(headers);
-    await this.notificationService.deleteNotifications(userId, ids);
+  @RequireLogin()
+  async deleteNotifications(
+    @CurrentUser() user: UserContext,
+    @Body() ids: number[],
+  ): Promise<null> {
+    await this.notificationService.deleteNotifications(user.id, ids);
     return null;
   }
 
   @Post()
-  async createNotification(@Body() request: CreateNotificationRequest) {
+  @RequireLogin()
+  async createNotification(
+    @Body() request: CreateNotificationRequest,
+  ): Promise<null> {
     await this.notificationService.createNotification(
       request.userId,
       request.message,
@@ -94,19 +92,28 @@ export class NotificationController {
   }
 
   @Post('view-phone')
+  @RequireLogin()
   async notifyViewPhone(
-    @Headers() headers: Record<string, string | undefined>,
+    @CurrentUser() user: UserContext,
     @Body() request: ViewPhoneNotificationRequest,
-  ) {
-    const currentUserRole = this.extractHeader(headers, 'x-auth-user-role');
-    const currentUserName = this.extractHeader(headers, 'x-auth-user-name');
-    const currentUserPhone = this.extractHeader(headers, 'x-auth-user-phone');
+  ): Promise<null> {
+    await this.notificationService.handleViewPhoneNotification(user, request);
+    return null;
+  }
 
-    await this.notificationService.handleViewPhoneNotification(
-      currentUserRole,
-      currentUserName,
-      currentUserPhone,
-      request,
+
+  @Post('test-create')
+  async testCreateNotification(
+    @Body() request: CreateNotificationRequest,
+    @CurrentUser() user: UserContext,
+  ): Promise<null> {
+
+    Logger.log(`>>>User ${user.id} - ${user.email} - ${user.role} is creating a notification for user ${request.userId}`);
+
+    await this.notificationService.createNotification(
+      request.userId,
+      request.message,
+      request.type,
     );
     return null;
   }
